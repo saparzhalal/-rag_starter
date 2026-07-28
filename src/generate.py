@@ -11,12 +11,15 @@ from google import genai
 MODEL_NAME = "gemini-3.1-flash-lite"  # free-tier eligible, fast -- fine for a live demo
 
 SYSTEM_INSTRUCTION = (
-    "You answer questions about Vue 3 and Nuxt using ONLY the documentation "
-    "excerpts provided below. Do not use any outside knowledge, even if you "
-    "know the answer. Cite which excerpt(s) you used inline like [1] or [2]. "
-    "If the excerpts don't actually contain the answer, say so plainly "
-    "instead of guessing."
+   
+    "You are a helpful assistant that answers questions about Vue 3 using ONLY "
+    "the documentation excerpts provided. Answer the user's question directly "
+    "and naturally. Combine information across multiple excerpts when needed. "
+    "If the answer is only partially supported by the excerpts, clearly say so. "
+    "Do NOT use outside knowledge or invent facts. Support every answer with "
+    "inline citations such as [1], [2], etc."
 )
+
 
 
 class GenerationError(Exception):
@@ -30,10 +33,18 @@ def _build_prompt(query: str, results) -> str:
         for i, r in enumerate(results)
     )
     return (
-        f"Documentation excerpts:\n\n{excerpts}\n\n"
-        f"Question: {query}\n\n"
-        f"Answer the question, citing excerpt numbers like [1]:"
-    )
+       
+    f"Documentation excerpts:\n\n{excerpts}\n\n"
+    f"Question: {query}\n\n"
+    "Instructions:\n"
+    "- Answer the question directly.\n"
+    "- Combine information from multiple excerpts when appropriate.\n"
+    "- If the excerpts only partially answer the question, explain that clearly.\n"
+    "- Do not use knowledge outside the provided excerpts.\n"
+    "- Cite every factual statement using [1], [2], etc.\n\n"
+    "Answer:"
+)
+    
 
 
 def generate_answer(query: str, results) -> str:

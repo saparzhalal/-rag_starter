@@ -30,14 +30,19 @@ class RagIndex:
     def __init__(self, chunks: list[Chunk]):
         self.chunks = chunks
         self.model = SentenceTransformer(MODEL_NAME)
-        # normalize so cosine similarity == plain dot product (faster)
+
+        texts = [
+            f"{c.doc_title}\n{c.heading}\n\n{c.text}"
+            for c in chunks
+        ]
+
         self.embeddings = self.model.encode(
-            [c.text for c in chunks],
+            texts,
             batch_size=32,
             normalize_embeddings=True,
             show_progress_bar=False,
         )
-
+        
     def search(self, query: str, top_k: int = 5) -> list[SearchResult]:
         if not query or not query.strip():
             return []
